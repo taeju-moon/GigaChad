@@ -2,7 +2,7 @@ import sys
 
 def main():
     if len(sys.argv) != 2:
-        print("Usage: gigachad <filename.gcd>")
+        print("Usage: gigachad <filename.giga>")
         sys.exit(1)
     
     filename = sys.argv[1]

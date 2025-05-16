@@ -1,0 +1,4 @@
+{
+    "UserName" : "만삣삐",
+    "InvalidTypeException": "InvalidTypeException: ${UserName}, 아쉽게도 InvalidTypeException이 났어."
+}

@@ -95,35 +95,3 @@ Go To Next Step, My Son
 ```
 
 줄바꿈 명령은 위와 같다
-
-# 조건문
-
-```
-넌 할 수 있어, My Son ( [조건] )
-[조건이 참일때 실행할 구문]
-포기하지마
-[조건이 거짓일때 실행할 구문]
-Good Job, You Fucking Bad Ass
-```
-
-```
-//int 만삣삐 = 2;
-//if (만삣삐 - 1) print("1이상") else print("1미만");
-너는 이제부터 FUCKING_ASSHOLE 만삣삐 이다
-만삣삐, 너는 이제부터 2 이다
-넌 할 수 있어, My Son ( 2 STOP OVER THINKING 1 )
-    기적같은 하루가 널 기다려, "1이상"
-포기하지마
-    기적같은 하루가 널 기다려, "1미만"
-Good Job, You Fucking Bad Ass
-```
-
-# 반복문
-
-```
-STEP BY STEP(FUCKING_ASSHOLE a, FUCKING_ASSHOLE b, FUCKING_ASSHOLE c) as I
-    [반복할 구문]
-앞으로 나아가
-```
-
-# GigaChad

@@ -1,4 +1,4 @@
-import sys
+import re
 
 
 class Data:
@@ -7,9 +7,35 @@ class Data:
         self.type = type
 
 
+class Util:
+    @staticmethod
+    def check_type(type: type, data: object):
+        if type == int:
+            return isinstance(data, int) or data.isdecimal()
+        return True
+
+
 class GigaChad:
     def __init__(self):
         self.datas = {}
+
+    def compile_input(self, line):
+        tokens = line.split(",")
+        if len(tokens) != 3:
+            raise ValueError(f"{line}을 해석할 수 없습니다. 입력 사용 예시")
+        des_value = tokens[1].strip()
+        if not self.datas.get(des_value):
+            raise KeyError(f"{des_value}라는 변수는 정의되지 않았습니다.")
+        prompt = tokens[2].strip().strip("?")
+        prompt = prompt.strip('"')
+        if self.datas[des_value].type == int:
+            temp = input(prompt)
+            if not Util.check_type(int, temp):
+                raise ValueError(
+                    f"int type인 변수 {des_value}에 {temp}를 지정할 수 없습니다.")
+            self.datas[des_value].data = int(temp)
+        else:
+            self.datas[des_value].data = str(input(prompt))
 
     def compile_define(self, line: str):
         tokens = line.replace("너는 이제부터", "").strip().split()
@@ -29,43 +55,32 @@ class GigaChad:
         tokens = line.split(" ")
         if len(tokens) <= 4:
             raise ValueError(f"{line}에 대입할 변수를 지정하지 않았습니다.")
-        tokens = tokens[1:]
-        insert_value = self.compile_instruction(tokens)
+        tokens = tokens[3:-1]
+        insert_value = self.compile_instruction(" ".join(tokens))
 
-        if not self.check_type(self.datas[des_value].type, insert_value):
+        if not Util.check_type(self.datas[des_value].type, insert_value):
             raise ValueError(
                 f"{self.datas[des_value].type} 타입의 변수 {des_value}에 {insert_value}를 넣을 수 없습니다.")
 
-        self.datas[des_value] = insert_value
-
-    def compile_input(self, line):
-        tokens = line.split(",")
-        if len(tokens) != 3:
-            raise ValueError(f"{line}을 해석할 수 없습니다. 입력 사용 예시")
-        des_value = tokens[1].strip()
-        if not self.datas.get(des_value):
-            raise KeyError(f"{des_value}라는 변수는 정의되지 않았습니다.")
-        prompt = tokens[2].strip().strip("?")
-        prompt = prompt.strip('"')
-        if self.datas[des_value].type == int:
-            temp = input(prompt)
-            if not self.check_type(int, temp):
-                raise ValueError(
-                    f"int type인 변수 {des_value}에 {temp}를 지정할 수 없습니다.")
-            self.datas[des_value].data = int(temp)
-        else:
-            self.datas[des_value].data = str(input(prompt))
+        self.datas[des_value].data = insert_value
 
     def compile_output(self, line: str):
-        tokens = line.split(",")
+        tokens = line.split("기적같은 하루가 널 기다려,")
         data = self.compile_instruction(tokens[1])
-        print(data)
+        print(data, end='')
 
     def compile_instruction(self, line: str):
+        line = line.strip()
+        if line.startswith('"') and line.endswith('"'):
+            return line.replace('"', '')
+
+        need_eval = False
+        if "HARD TRAINING" in line or "STOP OVER THINKING" in line or "AIM HIGH" in line or "DONT GIVE A SHIT" in line:
+            need_eval = True
         line = line.replace("HARD TRAINING", "+")
         line = line.replace("STOP OVER THINKING", "-")
         line = line.replace("AIM HIGH", "*")
-        line = line.replace("DOMINATE THE WEEK", "/")
+        line = line.replace("DONT GIVE A SHIT", "/")
         tokens = line.split(" ")
         output = []
         for token in tokens:
@@ -76,14 +91,12 @@ class GigaChad:
             else:
                 output.append(token)
         try:
-            return eval(" ".join(map(str, output)))
+            if need_eval:
+                return eval(" ".join(map(str, output)).replace('"', ''))
+            else:
+                return " ".join(map(str, output)).replace('"', '')
         except:
-            raise TypeError(f"{line}을 해석하지 못하였습니다.")
-
-    def check_type(self, type: type, data: object):
-        if type == int:
-            return data.isdecimal()
-        return True
+            raise TypeError(f"표현식 {line}을 해석하지 못하였습니다.")
 
     def compile(self, code):
         splitter = '\n'
@@ -105,10 +118,11 @@ class GigaChad:
             # 출력
             elif line.startswith("기적같은 하루가"):
                 self.compile_output(line)
+            # 줄바꿈
+            elif line.startswith("Go To Next Step, My Son"):
+                print()
+            # 빈 공간
+            elif line.strip() == "":
+                continue
             else:
                 raise NotImplementedError(f"{line}을 읽을 수 없어")
-
-    def compilePath(self, path):
-        with open(path) as file:
-            code = ''.join(file.readlines())
-            self.compile(code)

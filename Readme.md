@@ -62,7 +62,7 @@ FUCKING BADASS "Hello World"
 1. +: HARD TRAINING
 2. -: STOP OVER THINKING
 3. \*: AIM HIGH
-4. /: DOMINATE THE WEEK
+4. /: DONT GIVE A SHIT
 
 # 콘솔
 
@@ -89,6 +89,12 @@ FUCKING BADASS "Hello World"
 //print("Hello World")
 기적같은 하루가 널 기다려, "Hello World"
 ```
+
+```
+Go To Next Step, My Son
+```
+
+줄바꿈 명령은 위와 같다
 
 # 조건문
 

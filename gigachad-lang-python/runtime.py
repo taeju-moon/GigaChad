@@ -1,4 +1,6 @@
-import re
+from .error import ErrorMessage
+import json
+import os
 
 
 class Data:
@@ -18,21 +20,31 @@ class Util:
 class GigaChad:
     def __init__(self):
         self.datas = {}
+        json_path = os.path.join(os.path.dirname(__file__), "../gigachad.json")
+        try:
+            with open(json_path, "r", encoding="utf-8") as f:
+                error_data = json.load(f)
+        except FileNotFoundError:
+            raise FileNotFoundError(
+                "기가차드 에러 메시지 JSON이 사라졌다. 그건 마치 체육관에 벤치 없는 꼴이다.")
+        self.errorMessage = ErrorMessage(**error_data)
 
     def compile_input(self, line):
         tokens = line.split(",")
         if len(tokens) != 3:
-            raise ValueError(f"{line}을 해석할 수 없습니다. 입력 사용 예시")
+            raise NotImplementedError(
+                self.errorMessage.get_interpret_fail_exception(line))
         des_value = tokens[1].strip()
         if not self.datas.get(des_value):
-            raise KeyError(f"{des_value}라는 변수는 정의되지 않았습니다.")
+            raise KeyError(
+                self.errorMessage.get_value_not_defined_exception(des_value))
         prompt = tokens[2].strip().strip("?")
         prompt = prompt.strip('"')
         if self.datas[des_value].type == int:
             temp = input(prompt)
             if not Util.check_type(int, temp):
                 raise ValueError(
-                    f"int type인 변수 {des_value}에 {temp}를 지정할 수 없습니다.")
+                    self.errorMessage.get_invalid_value_exception(des_value, temp))
             self.datas[des_value].data = int(temp)
         else:
             self.datas[des_value].data = str(input(prompt))
@@ -42,25 +54,29 @@ class GigaChad:
         if len(tokens) == 4 and tokens[1] in ("ASSHOLE", "BADASS"):
             type_, name = tokens[1].strip(), tokens[2].strip()
             if self.datas.get(name):
-                raise ValueError(f"{name}은 이미 선언된 변수입니다.")
+                raise KeyError(
+                    self.errorMessage.get_value_already_defined_exception(name))
             self.datas[name] = Data(
                 None, int if type_ == "ASSHOLE" else str)
         else:
-            raise ValueError(f"Can't Interpret this line: {line}")
+            raise NotImplementedError(
+                self.errorMessage.get_interpret_fail_exception(line))
 
     def compile_substitute(self, line: str):
         des_value = line.split(",")[0].strip()
         if not self.datas.get(des_value):
-            raise ValueError(f"{des_value}라는 변수는 정의되어있지 않습니다. 변수를 먼저 지정해주세요.")
+            raise NameError(
+                self.errorMessage.get_value_not_defined_exception(des_value))
         tokens = line.split(" ")
         if len(tokens) <= 4:
-            raise ValueError(f"{line}에 대입할 변수를 지정하지 않았습니다.")
+            raise NotImplementedError(
+                self.errorMessage.get_interpret_fail_exception(line))
         tokens = tokens[3:-1]
         insert_value = self.compile_instruction(" ".join(tokens))
 
         if not Util.check_type(self.datas[des_value].type, insert_value):
-            raise ValueError(
-                f"{self.datas[des_value].type} 타입의 변수 {des_value}에 {insert_value}를 넣을 수 없습니다.")
+            raise ValueError(self.errorMessage.get_invalid_value_exception(
+                des_value, insert_value))
 
         self.datas[des_value].data = insert_value
 
@@ -96,14 +112,14 @@ class GigaChad:
             else:
                 return " ".join(map(str, output)).replace('"', '')
         except:
-            raise TypeError(f"표현식 {line}을 해석하지 못하였습니다.")
+            raise NotImplementedError(
+                self.errorMessage.get_interpret_fail_exception("표현식 "+line))
 
     def compile(self, code):
         splitter = '\n'
         lines = code.rstrip().split(splitter)
         if lines[0] != "Of Course" or lines[-1] != "See you tomorrow My Son":
-            raise ValueError(
-                "기가채드는 Of Course로 시작해서 See you tomorrow My Son으로 끝나야해.")
+            raise SyntaxError(self.errorMessage.get_format_exception())
         for line in lines[1:-1]:
             line = line.strip()
             # 정의
@@ -125,4 +141,5 @@ class GigaChad:
             elif line.strip() == "":
                 continue
             else:
-                raise NotImplementedError(f"{line}을 읽을 수 없어")
+                raise NotImplementedError(
+                    self.errorMessage.get_interpret_fail_exception(line))

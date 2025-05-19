@@ -1,4 +1,4 @@
-<img src="https://github.com/user-attachments/assets/58763d5b-ea23-47ff-a21a-9eeba832c220" alt="image" width="200" height="200" />
+<img src="https://github.com/user-attachments/assets/58763d5b-ea23-47ff-a21a-9eeba832c220" alt="image" width="200" height="220" />
 
 
 # 기가차드
